@@ -1,0 +1,223 @@
+---
+title: "ANAxBLU"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r libraries}
+library(tidyverse)
+library(ggtext)
+```
+
+
+```{r data, echo = FALSE}
+cols <- c("region", "chr", "midPos", "Nsites", "Fst")
+
+
+sz5 <- read_delim("data/ANAxBLU/ANA--x--BLU--size-5000--step-1000.tsv", 
+                  delim = "\t",
+                  skip = 2,
+                  col_names = cols)
+
+sz10 <- read_delim("data/ANAxBLU/ANA--x--BLU--size-10000--step-2000.tsv",
+                   delim = "\t",
+                   skip = 2,
+                   col_names = cols)
+
+sz25 <- read_delim("data/ANAxBLU/ANA--x--BLU--size-25000--step-5000.tsv",
+                  delim = "\t",
+                  skip = 2,
+                  col_names = cols)
+
+sz50 <- read_delim("data/ANAxBLU/ANA--x--BLU--size-50000--step-10000.tsv",
+                   delim = "\t",
+                   skip = 2,
+                   col_names = cols)
+```
+
+
+```{r sz5_allchroms, echo = FALSE}
+sz5_cum <- sz5 %>%
+  group_by(chr) %>%
+  summarise(max_pos = max(midPos)) %>%
+  mutate(pos_add = lag(cumsum(max_pos), default = 0)) %>%
+  select(chr, pos_add)
+
+sz5 <- sz5 %>%
+  inner_join(sz5_cum, by = "chr") %>%
+  mutate(pos_cum = midPos + pos_add)
+
+axis_set_sz5 <- sz5 %>%
+  group_by(chr) %>%
+  summarize(center = mean(pos_cum))
+
+
+
+sz5_plot <- ggplot(data = sz5, 
+                   mapping = aes(x = pos_cum,
+                                 y = Fst, 
+                                 color = as_factor(chr),
+                                 size = Fst)) +
+  geom_point(alpha = 0.75) +
+  scale_x_continuous(label = axis_set_sz5$chr,
+                      breaks = axis_set_sz5$center) +
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(-0.05, 1)) +
+  scale_color_manual(values = rep(c("#9bb5ce", "#415841"),
+                     unique(length(axis_set_sz5$chr)))) +
+  scale_size_continuous(range = c(0.5, 3)) +
+  labs(x = NULL,
+       y = "Fst",
+       title = "Size 5000 Step 1000",
+       subtitle = "anadromous alewife from the MDA, CAN, and NNE regions vs the SNE region") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.title.y = element_markdown(),
+        axis.text.x = element_text(angle = 60, 
+                                   size = 8, 
+                                   vjust = 0.5))
+sz5_plot
+```
+
+
+```{r sz10_allchroms, echo = FALSE}
+sz10_cum <- sz10 %>%
+  group_by(chr) %>%
+  summarise(max_pos = max(midPos)) %>%
+  mutate(pos_add = lag(cumsum(max_pos), default = 0)) %>%
+  select(chr, pos_add)
+
+sz10 <- sz10 %>%
+  inner_join(sz10_cum, by = "chr") %>%
+  mutate(pos_cum = midPos + pos_add)
+
+axis_set_sz10 <- sz10 %>%
+  group_by(chr) %>%
+  summarize(center = mean(pos_cum))
+
+
+
+sz10_plot <- ggplot(data = sz10, 
+                    mapping = aes(x = pos_cum, 
+                                  y = Fst,
+                                  color = as_factor(chr), 
+                                  size = Fst)) +
+  geom_point(alpha = 0.75) +
+  scale_x_continuous(label = axis_set_sz10$chr,
+                      breaks = axis_set_sz10$center) +
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(-0.05, 1)) +
+  scale_color_manual(values = rep(c("#9bb5ce", "#415841"),
+                     unique(length(axis_set_sz10$chr)))) +
+  scale_size_continuous(range = c(0.5, 3)) +
+  labs(x = NULL,
+       y = "Fst",
+       title = "Size 10000 Step 2000",
+       subtitle = "anadromous alewife from the MDA, CAN, and NNE regions vs the SNE region") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.title.y = element_markdown(),
+        axis.text.x = element_text(angle = 60, 
+                                   size = 8, 
+                                   vjust = 0.5))
+sz10_plot
+```
+
+
+```{r sz25_allchroms, echo = FALSE}
+sz25_cum <- sz25 %>%
+  group_by(chr) %>%
+  summarise(max_pos = max(midPos)) %>%
+  mutate(pos_add = lag(cumsum(max_pos), default = 0)) %>%
+  select(chr, pos_add)
+
+sz25 <- sz25 %>%
+  inner_join(sz25_cum, by = "chr") %>%
+  mutate(pos_cum = midPos + pos_add)
+
+axis_set_sz25 <- sz25 %>%
+  group_by(chr) %>%
+  summarize(center = mean(pos_cum))
+
+
+
+sz25_plot <- ggplot(data = sz25, 
+                    mapping = aes(x = pos_cum, 
+                                  y = Fst, 
+                                  color = as_factor(chr), 
+                                  size = Fst)) +
+  geom_point(alpha = 0.75) +
+  scale_x_continuous(label = axis_set_sz25$chr,
+                      breaks = axis_set_sz25$center) +
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(-0.05, 1)) +
+  scale_color_manual(values = rep(c("#9bb5ce", "#415841"),
+                     unique(length(axis_set_sz25$chr)))) +
+  scale_size_continuous(range = c(0.5, 3)) +
+  labs(x = NULL,
+       y = "Fst",
+       title = "Size 25000 Step 5000",
+       subtitle = "anadromous alewife from the MDA, CAN, and NNE regions vs the SNE region") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.title.y = element_markdown(),
+        axis.text.x = element_text(angle = 60, 
+                                   size = 8, 
+                                   vjust = 0.5))
+sz25_plot
+```
+
+
+```{r sz50_allchroms, echo = FALSE}
+sz50_cum <- sz50 %>%
+  group_by(chr) %>%
+  summarise(max_pos = max(midPos)) %>%
+  mutate(pos_add = lag(cumsum(max_pos), default = 0)) %>%
+  select(chr, pos_add)
+
+sz50 <- sz50 %>%
+  inner_join(sz50_cum, by = "chr") %>%
+  mutate(pos_cum = midPos + pos_add)
+
+axis_set_sz50 <- sz50 %>%
+  group_by(chr) %>%
+  summarize(center = mean(pos_cum))
+
+
+
+sz50_plot <- ggplot(data = sz50, 
+                    mapping = aes(x = pos_cum, 
+                                  y = Fst, 
+                                  color = as_factor(chr), 
+                                  size = Fst)) +
+  geom_point(alpha = 0.75) +
+  scale_x_continuous(label = axis_set_sz50$chr,
+                      breaks = axis_set_sz50$center) +
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(-0.05, 1)) +
+  scale_color_manual(values = rep(c("#9bb5ce", "#415841"),
+                     unique(length(axis_set_sz50$chr)))) +
+  scale_size_continuous(range = c(0.5, 3)) +
+  labs(x = NULL,
+       y = "Fst",
+       title = "Size 50000 Step 10000",
+       subtitle = "anadromous alewife from the MDA, CAN, and NNE regions vs the SNE region") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.title.y = element_markdown(),
+        axis.text.x = element_text(angle = 60, 
+                                   size = 8, 
+                                   vjust = 0.5))
+sz50_plot
+```
+
+
